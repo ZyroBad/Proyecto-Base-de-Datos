@@ -1,6 +1,8 @@
-﻿-- PROYECTO 2 
+﻿-- PROYECTO 2
 -- DDL COMPLETO
 -- David Sebastian Lemus Nitsch 241155
+
+SET client_encoding = 'UTF8';
 
 -- TABLA CATEGORIA
 CREATE TABLE categoria (
@@ -72,7 +74,7 @@ CREATE TABLE detalle_venta (
     FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
 );
 
--- TABLA PRODUCTO_PROVEEDOR (relaciÃ³n N:N entre producto y proveedor)
+-- TABLA PRODUCTO_PROVEEDOR (relación N:N entre producto y proveedor)
 CREATE TABLE producto_proveedor (
     id_producto INT NOT NULL,
     id_proveedor INT NOT NULL,
@@ -83,7 +85,7 @@ CREATE TABLE producto_proveedor (
     FOREIGN KEY (id_proveedor) REFERENCES proveedor(id_proveedor)
 );
 
--- TABLA HISTORIAL_STOCK (auditorÃ­a de cambios en el stock)
+-- TABLA HISTORIAL_STOCK (auditoría de cambios en el stock)
 CREATE TABLE historial_stock (
     id_historial SERIAL PRIMARY KEY,
     tipo_movimiento VARCHAR(20) NOT NULL CHECK (tipo_movimiento IN ('entrada', 'salida', 'ajuste')),
@@ -93,15 +95,15 @@ CREATE TABLE historial_stock (
     id_producto INT NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
 );
- -- DATOS DE PRUEBA 
- -- David Sebastian Lemus Nitsch 
 
+-- DATOS DE PRUEBA
+-- David Sebastian Lemus Nitsch
 
 -- CATEGORIA (5 registros)
 INSERT INTO categoria (nombre, descripcion) VALUES
-('ElectrÃ³nica', 'Productos electrÃ³nicos: computadoras, tablets, audÃ­fonos'),
-('Ropa', 'Prendas de vestir para hombre, mujer y niÃ±os'),
-('Hogar', 'ArtÃ­culos para el hogar y decoraciÃ³n'),
+('Electrónica', 'Productos electrónicos: computadoras, tablets, audífonos'),
+('Ropa', 'Prendas de vestir para hombre, mujer y niños'),
+('Hogar', 'Artículos para el hogar y decoración'),
 ('Deportes', 'Equipo deportivo y accesorios'),
 ('Libros', 'Libros y material educativo');
 
@@ -116,29 +118,29 @@ INSERT INTO proveedor (nombre, telefono, email, direccion) VALUES
 -- PRODUCTO (25 registros)
 INSERT INTO producto (nombre, descripcion, precio_base, stock, id_categoria) VALUES
 ('Laptop Lenovo', 'Laptop 16GB RAM, 512GB SSD', 4500.00, 10, 1),
-('Mouse InalÃ¡mbrico', 'Mouse ergonÃ³mico', 150.00, 50, 1),
-('Teclado MecÃ¡nico', 'Teclado RGB mecÃ¡nico', 350.00, 30, 1),
-('AudÃ­fonos Bluetooth', 'AudÃ­fonos con cancelaciÃ³n de ruido', 250.00, 25, 1),
+('Mouse Inalámbrico', 'Mouse ergonómico', 150.00, 50, 1),
+('Teclado Mecánico', 'Teclado RGB mecánico', 350.00, 30, 1),
+('Audífonos Bluetooth', 'Audífonos con cancelación de ruido', 250.00, 25, 1),
 ('Monitor 24"', 'Monitor Full HD 75Hz', 1200.00, 15, 1),
 ('Camiseta Deportiva', 'Camiseta talla M', 80.00, 100, 2),
-('PantalÃ³n Jeans', 'PantalÃ³n mezclilla azul', 200.00, 60, 2),
+('Pantalón Jeans', 'Pantalón mezclilla azul', 200.00, 60, 2),
 ('Chaqueta Impermeable', 'Chaqueta para lluvia', 350.00, 30, 2),
 ('Gorra Deportiva', 'Gorra ajustable', 50.00, 80, 2),
 ('Zapatos Casuales', 'Zapatos de tela', 180.00, 40, 2),
-('LÃ¡mpara LED', 'LÃ¡mpara de escritorio', 120.00, 45, 3),
+('Lámpara LED', 'Lámpara de escritorio', 120.00, 45, 3),
 ('Mesa Plegable', 'Mesa para exteriores', 450.00, 20, 3),
-('Silla ErgonÃ³mica', 'Silla para oficina', 800.00, 12, 3),
-('Almohada Memory', 'Almohada ortopÃ©dica', 150.00, 35, 3),
-('Juego de SÃ¡banas', 'SÃ¡banas 2 plazas', 180.00, 28, 3),
-('Pelota de FÃºtbol', 'Pelota oficial talla 5', 120.00, 55, 4),
+('Silla Ergonómica', 'Silla para oficina', 800.00, 12, 3),
+('Almohada Memory', 'Almohada ortopédica', 150.00, 35, 3),
+('Juego de Sábanas', 'Sábanas 2 plazas', 180.00, 28, 3),
+('Pelota de Fútbol', 'Pelota oficial talla 5', 120.00, 55, 4),
 ('Raqueta Tenis', 'Raqueta profesional', 350.00, 15, 4),
 ('Guantes Boxeo', 'Guantes 12oz', 250.00, 20, 4),
-('Rodilleras', 'ProtecciÃ³n para rodillas', 80.00, 40, 4),
+('Rodilleras', 'Protección para rodillas', 80.00, 40, 4),
 ('Cuerda Saltar', 'Cuerda ajustable', 45.00, 60, 4),
-('ProgramaciÃ³n en Python', 'Libro para principiantes', 180.00, 25, 5),
+('Programación en Python', 'Libro para principiantes', 180.00, 25, 5),
 ('SQL Avanzado', 'Libro de bases de datos', 220.00, 20, 5),
 ('JavaScript Moderno', 'Libro ES6+', 190.00, 18, 5),
-('Docker PrÃ¡ctico', 'GuÃ­a de contenedores', 210.00, 15, 5),
+('Docker Práctico', 'Guía de contenedores', 210.00, 15, 5),
 ('Inteligencia Artificial', 'Fundamentos de IA', 250.00, 12, 5);
 
 -- PRODUCTO_PROVEEDOR (relaciones producto-proveedor)
@@ -171,16 +173,16 @@ INSERT INTO producto_proveedor (id_producto, id_proveedor, precio_compra, fecha_
 
 -- CLIENTE (25 registros)
 INSERT INTO cliente (nombre, apellido, email, telefono, direccion) VALUES
-('Carlos', 'PÃ©rez', 'carlos.perez@mail.com', '50211112222', 'Zona 1, Guatemala'),
-('Ana', 'GarcÃ­a', 'ana.garcia@mail.com', '50222223333', 'Zona 2, Guatemala'),
-('Luis', 'MartÃ­nez', 'luis.martinez@mail.com', '50233334444', 'Zona 3, Guatemala'),
-('MarÃ­a', 'LÃ³pez', 'maria.lopez@mail.com', '50244445555', 'Zona 4, Guatemala'),
-('JosÃ©', 'RodrÃ­guez', 'jose.rodriguez@mail.com', '50255556666', 'Zona 5, Guatemala'),
-('Laura', 'FernÃ¡ndez', 'laura.fernandez@mail.com', '50266667777', 'Zona 6, Guatemala'),
-('Pedro', 'GonzÃ¡lez', 'pedro.gonzalez@mail.com', '50277778888', 'Zona 7, Guatemala'),
-('SofÃ­a', 'DÃ­az', 'sofia.diaz@mail.com', '50288889999', 'Zona 8, Guatemala'),
-('AndrÃ©s', 'SÃ¡nchez', 'andres.sanchez@mail.com', '50299990000', 'Zona 9, Guatemala'),
-('Valentina', 'RamÃ­rez', 'valentina.ramirez@mail.com', '50210101010', 'Zona 10, Guatemala'),
+('Carlos', 'Pérez', 'carlos.perez@mail.com', '50211112222', 'Zona 1, Guatemala'),
+('Ana', 'García', 'ana.garcia@mail.com', '50222223333', 'Zona 2, Guatemala'),
+('Luis', 'Martínez', 'luis.martinez@mail.com', '50233334444', 'Zona 3, Guatemala'),
+('María', 'López', 'maria.lopez@mail.com', '50244445555', 'Zona 4, Guatemala'),
+('José', 'Rodríguez', 'jose.rodriguez@mail.com', '50255556666', 'Zona 5, Guatemala'),
+('Laura', 'Fernández', 'laura.fernandez@mail.com', '50266667777', 'Zona 6, Guatemala'),
+('Pedro', 'González', 'pedro.gonzalez@mail.com', '50277778888', 'Zona 7, Guatemala'),
+('Sofía', 'Díaz', 'sofia.diaz@mail.com', '50288889999', 'Zona 8, Guatemala'),
+('Andrés', 'Sánchez', 'andres.sanchez@mail.com', '50299990000', 'Zona 9, Guatemala'),
+('Valentina', 'Ramírez', 'valentina.ramirez@mail.com', '50210101010', 'Zona 10, Guatemala'),
 ('Diego', 'Torres', 'diego.torres@mail.com', '50220202020', 'Mixco, Guatemala'),
 ('Camila', 'Flores', 'camila.flores@mail.com', '50230303030', 'Villa Nueva, Guatemala'),
 ('Juan', 'Morales', 'juan.morales@mail.com', '50240404040', 'Santa Catarina, Guatemala'),
@@ -193,17 +195,17 @@ INSERT INTO cliente (nombre, apellido, email, telefono, direccion) VALUES
 ('Gabriela', 'Medina', 'gabriela.medina@mail.com', '50202030405', 'Zona 16, Guatemala'),
 ('Manuel', 'Vargas', 'manuel.vargas@mail.com', '50203040506', 'Zona 17, Guatemala'),
 ('Isabella', 'Cruz', 'isabella.cruz@mail.com', '50204050607', 'Zona 18, Guatemala'),
-('SebastiÃ¡n', 'GuzmÃ¡n', 'sebastian.guzman@mail.com', '50205060708', 'Zona 19, Guatemala'),
+('Sebastián', 'Guzmán', 'sebastian.guzman@mail.com', '50205060708', 'Zona 19, Guatemala'),
 ('Valeria', 'Reyes', 'valeria.reyes@mail.com', '50206070809', 'Zona 20, Guatemala'),
-('Alejandro', 'PeÃ±a', 'alejandro.pena@mail.com', '50207080900', 'San JosÃ©, Guatemala');
+('Alejandro', 'Peña', 'alejandro.pena@mail.com', '50207080900', 'San José, Guatemala');
 
 -- EMPLEADO (5 registros)
 INSERT INTO empleado (nombre, apellido, email, cargo) VALUES
-('Juan', 'PÃ©rez', 'jperez@tienda.com', 'Vendedor'),
-('MarÃ­a', 'GarcÃ­a', 'mgarcia@tienda.com', 'Cajera'),
-('Luis', 'MartÃ­nez', 'lmartinez@tienda.com', 'Supervisor'),
-('Ana', 'RodrÃ­guez', 'arodriguez@tienda.com', 'Vendedora'),
-('Carlos', 'LÃ³pez', 'clopez@tienda.com', 'Gerente');
+('Juan', 'Pérez', 'jperez@tienda.com', 'Vendedor'),
+('María', 'García', 'mgarcia@tienda.com', 'Cajera'),
+('Luis', 'Martínez', 'lmartinez@tienda.com', 'Supervisor'),
+('Ana', 'Rodríguez', 'arodriguez@tienda.com', 'Vendedora'),
+('Carlos', 'López', 'clopez@tienda.com', 'Gerente');
 
 -- VENTA (25 registros)
 INSERT INTO venta (fecha, total, id_cliente, id_empleado) VALUES
@@ -233,7 +235,7 @@ INSERT INTO venta (fecha, total, id_cliente, id_empleado) VALUES
 ('2026-03-30', 690.00, 24, 2),
 ('2026-03-31', 450.00, 25, 4);
 
--- DETALLE_VENTA (mÃ¡s de 25 registros)
+-- DETALLE_VENTA (más de 25 registros)
 INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario, subtotal) VALUES
 (1, 1, 1, 4500.00, 4500.00),
 (1, 2, 2, 150.00, 300.00),
@@ -265,7 +267,7 @@ INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario, sub
 (19, 3, 1, 350.00, 350.00),
 (20, 4, 2, 250.00, 500.00);
 
--- HISTORIAL_STOCK (auditorÃ­a de movimientos de stock)
+-- HISTORIAL_STOCK (auditoría de movimientos de stock)
 INSERT INTO historial_stock (tipo_movimiento, cantidad, descripcion, fecha, id_producto) VALUES
 ('entrada', 10, 'Compra inicial', '2026-01-15 10:00:00', 1),
 ('entrada', 50, 'Compra inicial', '2026-01-10 11:00:00', 2),
@@ -279,7 +281,7 @@ INSERT INTO historial_stock (tipo_movimiento, cantidad, descripcion, fecha, id_p
 ('salida', 1, 'Venta #3', '2026-03-05 11:00:00', 5),
 ('salida', 3, 'Venta #4', '2026-03-07 14:00:00', 6),
 ('entrada', 20, 'Reabastecimiento', '2026-03-20 09:00:00', 1),
-('ajuste', 5, 'Ajuste por inventario fÃ­sico', '2026-03-25 16:00:00', 2);
+('ajuste', 5, 'Ajuste por inventario físico', '2026-03-25 16:00:00', 2);
 
 CREATE OR REPLACE VIEW vista_ventas_por_categoria AS
 SELECT
