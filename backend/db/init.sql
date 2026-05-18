@@ -4,6 +4,43 @@
 
 SET client_encoding = 'UTF8';
 
+-- =========================
+-- PROYECTO 3: SEGURIDAD Y ROLES
+-- =========================
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+-- Usuario de conexión (no superuser) requerido para calificación: proy3 / secret
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'proy3') THEN
+        CREATE ROLE proy3 LOGIN PASSWORD 'secret' NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT;
+    END IF;
+END $$;
+
+GRANT CONNECT ON DATABASE tienda TO proy3;
+GRANT USAGE ON SCHEMA public TO proy3;
+
+-- 5 roles en el DBMS (sin login)
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'rol_admin') THEN
+        CREATE ROLE rol_admin;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'rol_gerente') THEN
+        CREATE ROLE rol_gerente;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'rol_ventas') THEN
+        CREATE ROLE rol_ventas;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'rol_inventario') THEN
+        CREATE ROLE rol_inventario;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'rol_auditor') THEN
+        CREATE ROLE rol_auditor;
+    END IF;
+END $$;
+
 -- TABLA CATEGORIA
 CREATE TABLE categoria (
     id_categoria SERIAL PRIMARY KEY,
@@ -94,6 +131,16 @@ CREATE TABLE historial_stock (
     fecha TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     id_producto INT NOT NULL,
     FOREIGN KEY (id_producto) REFERENCES producto(id_producto)
+);
+
+-- Tabla de usuarios de aplicación (login/logout con sesión)
+CREATE TABLE app_usuario (
+    id_usuario SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    rol VARCHAR(20) NOT NULL CHECK (rol IN ('admin', 'gerente', 'ventas', 'inventario', 'auditor')),
+    activo BOOLEAN NOT NULL DEFAULT TRUE,
+    creado_en TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- DATOS DE PRUEBA
@@ -294,3 +341,60 @@ JOIN producto p ON c.id_categoria = p.id_categoria
 JOIN detalle_venta dv ON p.id_producto = dv.id_producto
 JOIN venta v ON dv.id_venta = v.id_venta
 GROUP BY c.id_categoria, c.nombre;
+
+-- Usuarios de prueba (uno por rol)
+INSERT INTO app_usuario (username, password_hash, rol) VALUES
+('admin', crypt('admin123', gen_salt('bf')), 'admin'),
+('gerente', crypt('gerente123', gen_salt('bf')), 'gerente'),
+('ventas', crypt('ventas123', gen_salt('bf')), 'ventas'),
+('inventario', crypt('inventario123', gen_salt('bf')), 'inventario'),
+('auditor', crypt('auditor123', gen_salt('bf')), 'auditor');
+
+-- Permisos granulares por rol
+REVOKE ALL ON ALL TABLES IN SCHEMA public FROM PUBLIC;
+REVOKE ALL ON ALL SEQUENCES IN SCHEMA public FROM PUBLIC;
+REVOKE ALL ON SCHEMA public FROM PUBLIC;
+
+GRANT USAGE ON SCHEMA public TO rol_admin, rol_gerente, rol_ventas, rol_inventario, rol_auditor;
+
+-- Admin: todo
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO rol_admin;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO rol_admin;
+
+-- Auditor: solo lectura
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO rol_auditor;
+
+-- Gerente: lectura total + gestión de clientes/empleados
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO rol_gerente;
+GRANT INSERT, UPDATE, DELETE ON cliente TO rol_gerente;
+GRANT INSERT, UPDATE, DELETE ON empleado TO rol_gerente;
+GRANT USAGE, SELECT ON SEQUENCE cliente_id_cliente_seq TO rol_gerente;
+GRANT USAGE, SELECT ON SEQUENCE empleado_id_empleado_seq TO rol_gerente;
+
+-- Ventas: consulta de catálogos + registrar ventas y movimiento de stock asociado
+GRANT SELECT ON categoria, producto, cliente, empleado TO rol_ventas;
+GRANT SELECT ON venta, detalle_venta TO rol_ventas;
+GRANT INSERT ON venta, detalle_venta, historial_stock TO rol_ventas;
+GRANT UPDATE (stock) ON producto TO rol_ventas;
+GRANT USAGE, SELECT ON SEQUENCE venta_id_venta_seq TO rol_ventas;
+GRANT USAGE, SELECT ON SEQUENCE detalle_venta_id_detalle_seq TO rol_ventas;
+GRANT USAGE, SELECT ON SEQUENCE historial_stock_id_historial_seq TO rol_ventas;
+
+-- Inventario: gestión de productos/proveedores/categorías y trazabilidad de stock
+GRANT SELECT ON categoria, proveedor, producto, producto_proveedor, historial_stock TO rol_inventario;
+GRANT INSERT, UPDATE, DELETE ON categoria, proveedor, producto, producto_proveedor TO rol_inventario;
+GRANT INSERT ON historial_stock TO rol_inventario;
+GRANT USAGE, SELECT ON SEQUENCE categoria_id_categoria_seq TO rol_inventario;
+GRANT USAGE, SELECT ON SEQUENCE proveedor_id_proveedor_seq TO rol_inventario;
+GRANT USAGE, SELECT ON SEQUENCE producto_id_producto_seq TO rol_inventario;
+GRANT USAGE, SELECT ON SEQUENCE historial_stock_id_historial_seq TO rol_inventario;
+
+-- Permitir al usuario de conexión validar credenciales (sin exponer tabla al PUBLIC)
+GRANT SELECT ON app_usuario TO proy3;
+
+-- Vincular el usuario de conexión (proy3) a los roles para poder hacer SET ROLE desde el backend
+GRANT rol_admin TO proy3;
+GRANT rol_gerente TO proy3;
+GRANT rol_ventas TO proy3;
+GRANT rol_inventario TO proy3;
+GRANT rol_auditor TO proy3;
