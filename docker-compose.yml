@@ -5,8 +5,8 @@ services:
     image: postgres:15-alpine
     container_name: tienda_db
     environment:
-      POSTGRES_USER: proy2
-      POSTGRES_PASSWORD: secret
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: tienda
       PGCLIENTENCODING: UTF8
     ports:
@@ -22,10 +22,11 @@ services:
     container_name: tienda_backend
     environment:
       DB_HOST: db
-      DB_USER: proy2
+      DB_USER: proy3
       DB_PASSWORD: secret
       DB_NAME: tienda
       DB_PORT: 5432
+      SESSION_SECRET: supersecret_proy3
     ports:
       - "3000:3000"
     depends_on:
